@@ -6,7 +6,7 @@ TABS.adjustments.initialize = function (callback) {
     var self = this;
     GUI.active_tab_ref = this;
     GUI.active_tab = 'adjustments';
-    
+
     function get_adjustment_ranges() {
         MSP.send_message(MSPCodes.MSP_ADJUSTMENT_RANGES, false, false, get_box_ids);
     }
@@ -29,23 +29,23 @@ TABS.adjustments.initialize = function (callback) {
 
         var template = $('#tab-adjustments-templates .adjustments .adjustment');
         var newAdjustment = template.clone();
-        
+
         $(newAdjustment).attr('id', 'adjustment-' + adjustmentIndex);
         $(newAdjustment).data('index', adjustmentIndex);
 
         //
         // update selected slot
         //
-        
-        if (semver.lt(CONFIG.apiVersion, "1.42.0")) {
+
+      //  if (semver.lt(CONFIG.apiVersion, "1.42.0")) {
             var adjustmentList = $(newAdjustment).find('.adjustmentSlot .slot');
             adjustmentList.val(adjustmentRange.slotIndex);
-        }
+      //  }
 
         //
         // populate source channel select box
         //
-        
+
         var channelList = $(newAdjustment).find('.channelInfo .channel');
         var channelOptionTemplate = $(channelList).find('option');
         channelOptionTemplate.remove();
@@ -85,7 +85,7 @@ TABS.adjustments.initialize = function (callback) {
         //
         // configure range
         //
-        
+
         var channel_range = {
                 'min': [  900 ],
                 'max': [ 2100 ]
@@ -119,16 +119,16 @@ TABS.adjustments.initialize = function (callback) {
             density: 4,
             stepped: true
         });
-        
+
         //
         // add the enable/disable behavior
         //
-        
+
         var enableElement = $(newAdjustment).find('.enable');
         $(enableElement).data('adjustmentElement', newAdjustment);
         $(enableElement).change(function() {
             var adjustmentElement = $(this).data('adjustmentElement');
-            if ($(this).prop("checked")) { 
+            if ($(this).prop("checked")) {
                 $(adjustmentElement).find(':input').prop("disabled", false);
                 $(adjustmentElement).find('.channel-slider').removeAttr("disabled");
                 var rangeElement = $(adjustmentElement).find('.range .channel-slider');
@@ -145,10 +145,10 @@ TABS.adjustments.initialize = function (callback) {
             // keep this element enabled
             $(this).prop("disabled", false);
         });
-        
-        var isEnabled = (adjustmentRange.range.start != adjustmentRange.range.end); 
+
+        var isEnabled = (adjustmentRange.range.start != adjustmentRange.range.end);
         $(enableElement).prop("checked", isEnabled).change();
-        
+
         return newAdjustment;
     }
 
@@ -163,13 +163,13 @@ TABS.adjustments.initialize = function (callback) {
             var newAdjustment = addAdjustment(adjustmentIndex, ADJUSTMENT_RANGES[adjustmentIndex], auxChannelCount);
             modeTableBodyElement.append(newAdjustment);
         }
-        
 
-        if (semver.gte(CONFIG.apiVersion, "1.42.0")) {
+
+        /* REMOVING NEW BF VERSION =>      if (semver.gte(CONFIG.apiVersion, "1.42.0")) {
             $('.tab-adjustments .adjustmentSlotsHelp').hide();
             $('.tab-adjustments .adjustmentSlotHeader').hide();
             $('.tab-adjustments .adjustmentSlot').hide();
-        }
+        }*/
 
         // translate to user-selected language
         i18n.localizePage();
@@ -179,9 +179,9 @@ TABS.adjustments.initialize = function (callback) {
 
             // update internal data structures based on current UI elements
             var requiredAdjustmentRangeCount = ADJUSTMENT_RANGES.length;
-            
+
             ADJUSTMENT_RANGES = [];
-            
+
             var defaultAdjustmentRange = {
                 slotIndex: 0,
                 auxChannelIndex: 0,
@@ -195,13 +195,13 @@ TABS.adjustments.initialize = function (callback) {
 
             $('.tab-adjustments .adjustments .adjustment').each(function () {
                 var adjustmentElement = $(this);
-                
+
                 if ($(adjustmentElement).find('.enable').prop("checked")) {
                     var rangeValues = $(this).find('.range .channel-slider').val();
                     var slotIndex = 0;
-                    if (semver.lt(CONFIG.apiVersion, "1.42.0")) {
+                  //  if (semver.lt(CONFIG.apiVersion, "1.42.0")) {
                         slotIndex = parseInt($(this).find('.adjustmentSlot .slot').val());
-                    }
+                  //  }
 
                     var adjustmentRange = {
                         slotIndex: slotIndex,
@@ -218,16 +218,16 @@ TABS.adjustments.initialize = function (callback) {
                     ADJUSTMENT_RANGES.push(defaultAdjustmentRange);
                 }
             });
-            
+
             for (var adjustmentRangeIndex = ADJUSTMENT_RANGES.length; adjustmentRangeIndex < requiredAdjustmentRangeCount; adjustmentRangeIndex++) {
                 ADJUSTMENT_RANGES.push(defaultAdjustmentRange);
             }
-            
+
             //
             // send data to FC
             //
             mspHelper.sendAdjustmentRanges(save_to_eeprom);
-            
+
             function save_to_eeprom() {
                 MSP.send_message(MSPCodes.MSP_EEPROM_WRITE, false, false, function () {
                     GUI.log(i18n.getMessage('adjustmentsEepromSaved'));
@@ -243,13 +243,13 @@ TABS.adjustments.initialize = function (callback) {
                 channelPosition = 2100;
             }
             var percentage = (channelPosition - 900) / (2100-900) * 100;
-            
+
             $('.adjustments .adjustment').each( function () {
                 var auxChannelCandidateIndex = $(this).find('.channel').val();
                 if (auxChannelCandidateIndex != auxChannelIndex) {
                     return;
                 }
-                
+
                 $(this).find('.range .marker').css('left', percentage + '%');
             });
         }
@@ -264,7 +264,7 @@ TABS.adjustments.initialize = function (callback) {
 
             for (var auxChannelIndex = 0; auxChannelIndex < auxChannelCount; auxChannelIndex++) {
                 update_marker(auxChannelIndex, RC.channels[auxChannelIndex + 4]);
-            }           
+            }
         }
 
         // update ui instantly on first load
@@ -291,9 +291,10 @@ TABS.adjustments.adjust_template = function () {
     var selectFunction = $('#functionSelectionSelect');
     var elementsNumber;
 
-    if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+    /* REMOVING NEW BF VERSION =>      if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
         elementsNumber = 31; // OSD Profile Select & LED Profile Select
-    } else if (semver.gte(CONFIG.apiVersion, "1.40.0")) {
+    } else */
+    if (semver.gte(CONFIG.apiVersion, "1.40.0")) {
         elementsNumber = 29; // PID Audio
     } else if (semver.gte(CONFIG.apiVersion, "1.39.0")) {
         elementsNumber = 26; // PID Audio
@@ -306,7 +307,7 @@ TABS.adjustments.adjust_template = function () {
     for (let i = 0; i < elementsNumber; i++) {
         selectFunction.append(new Option(i18n.getMessage('adjustmentsFunction' + i), i));
     }
-    
+
     // For 1.40, the D Setpoint has been replaced, so we replace it with the correct values
     if (semver.gte(CONFIG.apiVersion, "1.40.0")) {
 

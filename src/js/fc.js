@@ -588,7 +588,7 @@ var FC = {
 
         if (semver.eq(CONFIG.apiVersion, "1.40.0")) {
             versionFilterDefaults.dterm_lowpass2_hz = 200;
-        } else if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+        }   /* REMOVING NEW BF VERSION =>    else if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
             versionFilterDefaults.gyro_lowpass_hz = 150;
             versionFilterDefaults.gyro_lowpass_type = FC.FILTER_TYPE_FLAGS.BIQUAD;
             versionFilterDefaults.gyro_lowpass2_hz = 0;
@@ -597,7 +597,7 @@ var FC = {
             versionFilterDefaults.dterm_lowpass_type = FC.FILTER_TYPE_FLAGS.BIQUAD;
             versionFilterDefaults.dterm_lowpass2_hz = 150;
             versionFilterDefaults.dterm_lowpass2_type = FC.FILTER_TYPE_FLAGS.BIQUAD;
-        }
+        }*/
         return versionFilterDefaults;
     },
 };

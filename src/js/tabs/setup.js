@@ -202,10 +202,10 @@ TABS.setup.initialize = function (callback) {
         // We add all the arming/disarming flags available, and show/hide them if needed.
         var prepareDisarmFlags = function() {
 
-            var disarmFlagElements = ['NO_GYRO', 
-                                      'FAILSAFE', 
-                                      'RX_FAILSAFE', 
-                                      'BAD_RX_RECOVERY', 
+            var disarmFlagElements = ['NO_GYRO',
+                                      'FAILSAFE',
+                                      'RX_FAILSAFE',
+                                      'BAD_RX_RECOVERY',
                                       'BOXFAILSAFE',
                                       'THROTTLE',
                                       'ANGLE',
@@ -221,7 +221,7 @@ TABS.setup.initialize = function (callback) {
                                      ];
 
             if (semver.gte(CONFIG.apiVersion, "1.38.0")) {
-                disarmFlagElements.splice(disarmFlagElements.indexOf('THROTTLE'), 0, 'RUNAWAY_TAKEOFF'); 
+                disarmFlagElements.splice(disarmFlagElements.indexOf('THROTTLE'), 0, 'RUNAWAY_TAKEOFF');
             }
 
             if (semver.gte(CONFIG.apiVersion, "1.39.0")) {
@@ -229,7 +229,7 @@ TABS.setup.initialize = function (callback) {
                                                                 'GPS']);
             }
 
-            if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+          /* REMOVE BF apiVersion=>  if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
                 disarmFlagElements.splice(disarmFlagElements.indexOf('OSD_MENU'), 1);
                 disarmFlagElements = disarmFlagElements.concat(['RESC']);
                 disarmFlagElements = disarmFlagElements.concat(['RPMFILTER']);
@@ -237,7 +237,7 @@ TABS.setup.initialize = function (callback) {
             if (semver.gte(CONFIG.apiVersion, "1.42.0")) {
                 disarmFlagElements.splice(disarmFlagElements.indexOf('THROTTLE'), 0, 'CRASH');
                 disarmFlagElements = disarmFlagElements.concat(['REBOOT_REQD']);
-            }
+            }*/
 
             // Always the latest element
             disarmFlagElements = disarmFlagElements.concat(['ARM_SWITCH']);

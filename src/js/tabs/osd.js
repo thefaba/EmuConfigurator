@@ -68,13 +68,13 @@ SYM.loadSymbols = function() {
      * - Symbols used in this versions
      * - That were moved or didn't exist in the font file
      */
-    if (semver.lt(CONFIG.apiVersion, "1.42.0")) {
+//    if (semver.lt(CONFIG.apiVersion, "1.42.0")) {
         SYM.AH_CENTER_LINE = 0x26;
         SYM.AH_CENTER = 0x7E;
         SYM.AH_CENTER_LINE_RIGHT = 0x27;
         SYM.SPEED = null;
         SYM.LINK_QUALITY = null;
-    }
+  //  }
 }
 
 var STICK_OVERLAY_SPRITE = [
@@ -1452,7 +1452,7 @@ OSD.chooseFields = function () {
                                         OSD.constants.DISPLAY_FIELDS = OSD.constants.DISPLAY_FIELDS.concat([
                                             F.G_FORCE,
                                         ]);
-                                        if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+                                /* REMOVE BF apiVersion=>          if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
                                             OSD.constants.DISPLAY_FIELDS = OSD.constants.DISPLAY_FIELDS.concat([
                                                 F.MOTOR_DIAG,
                                                 F.LOG_STATUS,
@@ -1472,7 +1472,7 @@ OSD.chooseFields = function () {
                                                     F.RSSI_DBM_VALUE
                                                 ]);
                                             }
-                                        }
+                                        }*/
                                     }
                                 }
                             }
@@ -1552,7 +1552,7 @@ OSD.chooseFields = function () {
             F.BLACKBOX,
             F.BLACKBOX_LOG_NUMBER
         ];
-        if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+      /* REMOVE BF apiVersion=>    if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
             OSD.constants.STATISTIC_FIELDS = OSD.constants.STATISTIC_FIELDS.concat([
                 F.MAX_G_FORCE,
                 F.MAX_ESC_TEMP,
@@ -1569,7 +1569,7 @@ OSD.chooseFields = function () {
                 F.TOTAL_FLIGHT_DIST,
                 F.MIN_RSSI_DBM
             ]);
-        }
+        }*/
     }
 
     // Choose warnings
@@ -1590,21 +1590,21 @@ OSD.chooseFields = function () {
             F.RC_SMOOTHING_FAILURE
         ]);
     }
-    if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+    /* REMOVE BF apiVersion=>  if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
         OSD.constants.WARNINGS = OSD.constants.WARNINGS.concat([
             F.FAILSAFE,
             F.LAUNCH_CONTROL,
             F.GPS_RESCUE_UNAVAILABLE,
             F.GPS_RESCUE_DISABLED
         ]);
-    }
+    }*/
 
     OSD.constants.TIMER_TYPES = [
         'ON_TIME',
         'TOTAL_ARMED_TIME',
         'LAST_ARMED_TIME'
     ];
-    if (semver.gte(CONFIG.apiVersion, "1.42.0")) {
+    /* REMOVE BF apiVersion=>  if (semver.gte(CONFIG.apiVersion, "1.42.0")) {
         OSD.constants.TIMER_TYPES = OSD.constants.TIMER_TYPES.concat([
             'ON_ARM_TIME'
         ]);
@@ -1613,7 +1613,7 @@ OSD.chooseFields = function () {
             F.LINK_QUALITY,
             F.RSSI_DBM,
         ]);
-    }
+    }*/
 };
 
 OSD.updateDisplaySize = function () {
@@ -1734,11 +1734,11 @@ OSD.msp = {
                 }
                 console.log(warningFlags);
                 result.push16(warningFlags);
-                if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+              /* REMOVE BF apiVersion=>    if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
                     result.push32(warningFlags);
 
                     result.push8(OSD.data.osd_profiles.selected + 1);
-                }
+                }*/
             }
 
         }
@@ -1867,11 +1867,11 @@ OSD.msp = {
             // Parse enabled warnings
             var warningCount = OSD.constants.WARNINGS.length;
             var warningFlags = view.readU16();
-            if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+        /* REMOVE BF apiVersion=>      if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
                 warningCount = view.readU8();
                 // the flags were replaced with a 32bit version
                 warningFlags = view.readU32();
-            }
+            }*/
             for (var i = 0; i < warningCount; i++) {
 
                 // Known warning field
@@ -1888,13 +1888,13 @@ OSD.msp = {
         }
 
         // OSD profiles
-        if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
+        /* REMOVE BF apiVersion=>  if (semver.gte(CONFIG.apiVersion, "1.41.0")) {
             d.osd_profiles.number = view.readU8();
             d.osd_profiles.selected = view.readU8() - 1;
-        } else {
+        } else {*/
             d.osd_profiles.number = 1;
             d.osd_profiles.selected = 0;
-        }
+        //}
 
         // Now we have the number of profiles, process the OSD elements
         for (let item of items_positions_read) {
@@ -2672,9 +2672,9 @@ TABS.osd.initialize = function (callback) {
         fontPresetsElement.change(function (e) {
             var $font = $('.fontpresets option:selected');
             var fontver = 1;
-            if (semver.gte(CONFIG.apiVersion, "1.42.0")) {
+          /* REMOVE BF apiVersion=>    if (semver.gte(CONFIG.apiVersion, "1.42.0")) {
                 fontver = 2;
-            }
+            }*/
             $('.font-manager-version-info').text(i18n.getMessage('osdDescribeFontVersion' + fontver));
             $.get('./resources/osd/' + fontver + '/' + $font.data('font-file') + '.mcm', function (data) {
                 FONT.parseMCMFontFile(data);
