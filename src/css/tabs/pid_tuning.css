@@ -824,6 +824,19 @@ width: 40%;
 
 .subtab-filter .two_columns .two_columns_second{
     margin-left: 10px;
+    margin-right: 10px;
+    height: fit-content;
+}
+
+.subtab-filter .two_columns .kalmanFilterSettingsPanel{
+    margin-left: 10px;
+
+    height: fit-content;
+}
+
+.subtab-filter .two_columns .imufFilterSettingsPanel{
+    margin-left: 10px;
+    margin-right: 10px;
     height: fit-content;
 }
 
