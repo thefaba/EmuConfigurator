@@ -328,6 +328,14 @@ MspHelper.prototype.process_data = function(dataHandler) {
                 RC_tuning.dynamic_THR_PID_I = parseFloat((data.readU8() / 100).toFixed(2));
                 RC_tuning.dynamic_THR_PID_D = parseFloat((data.readU8() / 100).toFixed(2));
                 break;
+
+
+
+            case MSPCodes.MSP_EMUF:
+                EMUF_ADVANCED.dynamic_THR_PID_I = parseFloat((data.readU8() / 100).toFixed(2));
+                EMUF_ADVANCED.dynamic_THR_PID_D = parseFloat((data.readU8() / 100).toFixed(2));
+                  break;
+
             case MSPCodes.MSP_PID:
                 // PID data arrived, we need to scale it and save to appropriate bank / array
                 for (var i = 0, needle = 0; i < (data.byteLength / 3); i++, needle += 3) {
@@ -388,6 +396,7 @@ MspHelper.prototype.process_data = function(dataHandler) {
                     GPS_CONFIG.auto_config = data.readU8();
                     GPS_CONFIG.auto_baud = data.readU8();
                 }
+                GPS_CONFIG.distanceLimit = data.readU16();
                 break;
             case MSPCodes.MSP_GPS_RESCUE:
                 GPS_RESCUE.angle             = data.readU16();
@@ -543,6 +552,9 @@ MspHelper.prototype.process_data = function(dataHandler) {
                 break;
             case MSPCodes.MSP_SET_RC_TUNING:
                 console.log('RC Tuning saved');
+                break;
+            case MSPCodes.MSP_SET_EMUF:
+                console.log('EMUF advanced settings saved');
                 break;
             case MSPCodes.MSP_ACC_CALIBRATION:
                 console.log('Accel calibration executed');
@@ -986,7 +998,7 @@ MspHelper.prototype.process_data = function(dataHandler) {
             case MSPCodes.MSP_PID_ADVANCED:
                 ADVANCED_TUNING.rollPitchItermIgnoreRate = data.readU16();
                 ADVANCED_TUNING.yawItermIgnoreRate = data.readU16();
-                ADVANCED_TUNING.yaw_p_limit = data.readU16();
+                ADVANCED_TUNING.errorBoost = data.readU16();
                 ADVANCED_TUNING.feathered_pids = data.readU8();
                 ADVANCED_TUNING.vbatPidCompensation = data.readU8();
                 if (semver.gte(CONFIG.apiVersion, "1.20.0")) {
@@ -995,7 +1007,7 @@ MspHelper.prototype.process_data = function(dataHandler) {
                     } else {
                         ADVANCED_TUNING.dtermSetpointTransition = data.readU8();
                     }
-                    ADVANCED_TUNING.dtermSetpointWeight = data.readU8();
+                    ADVANCED_TUNING.errorBoostLimit = data.readU8();
                     ADVANCED_TUNING.iDecay = data.readU8();
                     ADVANCED_TUNING.toleranceBandReduction = data.readU8();
                     ADVANCED_TUNING.itermThrottleGain = data.readU8();
@@ -1025,6 +1037,7 @@ MspHelper.prototype.process_data = function(dataHandler) {
                                     ADVANCED_TUNING.feedforwardPitch = data.readU16();
                                     ADVANCED_TUNING.feedforwardYaw   = data.readU16();
                                     ADVANCED_TUNING.antiGravityMode  = data.readU8();
+                                    ADVANCED_TUNING.itermRelaxCutoff = data.readU8();
 
                                 }
                             }
@@ -1417,6 +1430,7 @@ MspHelper.prototype.crunch = function(code) {
                 }
             }
             break;
+
         case MSPCodes.MSP_SET_RC_TUNING:
             buffer.push8(Math.round(RC_tuning.RC_RATE * 100))
                 .push8(Math.round(RC_tuning.RC_EXPO * 100));
@@ -1443,15 +1457,26 @@ MspHelper.prototype.crunch = function(code) {
                 buffer.push8(Math.round(RC_tuning.rcPitchRate * 100));
                 buffer.push8(Math.round(RC_tuning.RC_PITCH_EXPO * 100));
             }
-
             buffer.push8(Math.round(RC_tuning.dynamic_THR_PID_I* 100));
             buffer.push8(Math.round(RC_tuning.dynamic_THR_PID_D * 100));
+
             break;
+
+
+        case MSPCodes.MSP_SET_EMUF:
+            buffer.push8(Math.round(EMUF_ADVANCED.dynamic_THR_PID_I * 100));
+            buffer.push8(Math.round(EMUF_ADVANCED.dynamic_THR_PID_D * 100));
+        //    GUI.log(EMUF_ADVANCED.dynamic_THR_PID_I);
+        //    GUI.log(EMUF_ADVANCED.dynamic_THR_PID_D);
+        //    GUI.log("Andrey")
+            break;
+
         case MSPCodes.MSP_SET_RX_MAP:
             for (var i = 0; i < RC_MAP.length; i++) {
                 buffer.push8(RC_MAP[i]);
             }
             break;
+
         case MSPCodes.MSP_SET_ACC_TRIM:
             buffer.push16(CONFIG.accelerometerTrims[0])
                 .push16(CONFIG.accelerometerTrims[1]);
@@ -1500,6 +1525,7 @@ MspHelper.prototype.crunch = function(code) {
                 buffer.push8(GPS_CONFIG.auto_config)
                     .push8(GPS_CONFIG.auto_baud);
             }
+            buffer.push16(GPS_CONFIG.distanceLimit);
             break;
         case MSPCodes.MSP_SET_GPS_RESCUE:
             buffer.push16(GPS_RESCUE.angle)
@@ -1704,7 +1730,7 @@ MspHelper.prototype.crunch = function(code) {
                           .push16(FILTER_CONFIG.dterm_lowpass2_hz);
                 }
 
-            
+
             break;
             case MSPCodes.MSP_SET_FAST_KALMAN:
             buffer.push16(KALMAN_FILTER_CONFIG.gyro_filter_q);
@@ -1724,7 +1750,7 @@ MspHelper.prototype.crunch = function(code) {
             if (semver.gte(CONFIG.apiVersion, "1.20.0")) {
                 buffer.push16(ADVANCED_TUNING.rollPitchItermIgnoreRate)
                     .push16(ADVANCED_TUNING.yawItermIgnoreRate)
-                    .push16(ADVANCED_TUNING.yaw_p_limit)
+                    .push16(ADVANCED_TUNING.errorBoost)
                     .push8(ADVANCED_TUNING.feathered_pids)
                     .push8(ADVANCED_TUNING.vbatPidCompensation);
 
@@ -1734,7 +1760,7 @@ MspHelper.prototype.crunch = function(code) {
                     buffer.push8(ADVANCED_TUNING.dtermSetpointTransition);
                 }
 
-                buffer.push8(Math.min(ADVANCED_TUNING.dtermSetpointWeight, 254))
+                buffer.push8(Math.min(ADVANCED_TUNING.errorBoostLimit))
                       .push8(ADVANCED_TUNING.iDecay)
                       .push8(ADVANCED_TUNING.toleranceBandReduction)
                       .push8(ADVANCED_TUNING.itermThrottleGain)
@@ -1763,9 +1789,8 @@ MspHelper.prototype.crunch = function(code) {
                                       .push16(ADVANCED_TUNING.feedforwardRoll)
                                       .push16(ADVANCED_TUNING.feedforwardPitch)
                                       .push16(ADVANCED_TUNING.feedforwardYaw)
-                                      .push8(ADVANCED_TUNING.antiGravityMode);
-
-
+                                      .push8(ADVANCED_TUNING.antiGravityMode)
+                                      .push8(ADVANCED_TUNING.itermRelaxCutoff);
                             }
                         }
                     }
